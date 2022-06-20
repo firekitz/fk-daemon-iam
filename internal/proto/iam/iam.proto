@@ -1,0 +1,74 @@
+syntax = "proto3";
+package iampb;
+
+option go_package = "github.com/firekitz/proto/iampb";
+
+import "google/api/annotations.proto";
+import "validate/validate.proto";
+
+service iam {
+  rpc auth(authRequest) returns (authResponse) {
+    option (google.api.http) = {
+      post: "/v1/auth",
+      body: "*"
+    };
+  }
+  rpc VerifyToken(VerifyTokenRequest) returns (VerifyTokenResponse) {
+    option (google.api.http) = {
+      post: "/v1/tokens/verify",
+      body: "*"
+    };
+  }
+  rpc CreateToken(CreateTokenRequest) returns (CreateTokenResponse) {
+    option (google.api.http) = {
+      post: "/v1/tokens",
+      body: "*"
+    };
+  }
+}
+
+message authResponse {
+  int64 statusCode = 1;
+  string errorMessage = 2;
+  int64 domainId = 3;
+  int64 projectId = 4;
+  int64 groupId = 5;
+  int64 accountId = 6;
+  int64 accountType = 7;
+  int64 issuedAt = 8;
+  int64 expiresAt = 9;
+}
+
+message authRequest {
+  string accessToken = 1;
+  repeated int64 permissions = 2;
+}
+
+message VerifyTokenRequest {
+  string accessToken = 1;
+}
+
+message VerifyTokenResponse {
+  int64 statusCode = 1;
+  string errorMessage = 2;
+  int64 domainId = 3;
+  int64 projectId = 4;
+  int64 groupId = 5;
+  int64 accountId = 6;
+  int64 accountType = 7;
+  int64 issuedAt = 8;
+  int64 expiresAt = 9;
+}
+
+message CreateTokenRequest {
+  int64 domainId = 3 [(validate.rules).int64.gt = 0];
+  int64 projectId = 4 [(validate.rules).int64.gt = 0];
+  int64 groupId = 5 [(validate.rules).int64.gt = 0];
+  int64 accountId = 6 [(validate.rules).int64.gt = 0];
+  int64 accountType = 7;
+}
+
+message CreateTokenResponse {
+  string accessToken = 1;
+  string refreshToken = 2;
+}
